@@ -1,36 +1,46 @@
-import { GoogleGenAI } from "@google/genai";
-import dotenv from "dotenv";
+import "dotenv/config";
 
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { generateText, Output } from "ai";
+import { z } from "zod";
 
-dotenv.config();
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+const openrouter = createOpenRouter({
+  apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+const reviewSchema = z.object({
+  summary: z.string(),
+  issues: z.array(z.string()),
+  risks: z.array(z.string()),
+  suggestions: z.array(z.string()),
+});
 
-function analisarRegrasReact({ componentCode }) {
-  if (!componentCode.includes("propTypes") && !componentCode.includes(":")) {
-    return "Aviso local: Falta tipagem no componente.";
-  }
-  return "Análise local: Sem erros graves.";
+const componentCode = `
+export function Button(props) {
+  return <button {...props}>Click</button>;
 }
+`;
 
-async function run() {
-  const component = `export function Button(props) { return <button {...props} /> }`;
+async function main() {
+  const result = await generateText({
+    model: openrouter("google/gemini-2.5-flash"),
+    output: Output.object({
+      schema: reviewSchema,
+    }),
+    system: `
+Você é um Staff Frontend Engineer especialista em React, TypeScript, acessibilidade, testes e Design Systems.
+Responda de forma objetiva e técnica.
+`,
+    prompt: `
+Analise este componente React:
 
-  // 2. Você passa a função DIRETO no array de tools, sem JSON schema!
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: `Faça o code review deste componente React: ${component}`,
-    config: {
-      // O SDK faz a mágica de executar e devolver o resultado sozinho
-      tools: [analisarRegrasReact], 
-    },
+\`\`\`tsx
+${componentCode}
+\`\`\`
+`,
   });
 
-  // 3. A resposta já vem pronta e mastigada
-  console.log(response.text);
+  console.log(JSON.stringify(result.output, null, 2));
 }
 
-run();
+main().catch(console.error);
