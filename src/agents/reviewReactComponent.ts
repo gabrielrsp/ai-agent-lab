@@ -3,15 +3,17 @@ import { generateText, Output } from "ai";
 import { openrouter } from "../providers/openRouter";
 import { reviewSchema } from "../schemas/reviewSchema";
 import { checkTypes } from "../tools/analysisTools/checkTypes";
-import { readRelatedFiles } from "../tools/contextTools/readRelatedFiles";
 import { checkAccessibility } from "../tools/analysisTools/checkAccessibility";
 import { ToolResult } from "../types/ToolResult";
+import { buildContext } from "../context/buildContext";
 
 
 export async function reviewReactComponent(code: string, filePath: string) {
  
-  const relatedFiles = readRelatedFiles(filePath)
- 
+  const context = buildContext(
+    filePath,
+    code
+  );
   const toolResults: ToolResult[] = [
     {
       toolName: "checkTypes",
@@ -47,9 +49,9 @@ Tool Results:
 
 ${JSON.stringify(toolResults, null, 2)}
 
-Related Files:
+Context:
 
-${JSON.stringify(relatedFiles, null, 2)}
+${JSON.stringify(context, null, 2)}
 
 
 Analyze this React component:

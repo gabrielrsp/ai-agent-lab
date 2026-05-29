@@ -7,6 +7,7 @@ export function readRelatedFiles(filePath: string) {
   const candidates = [
     "styles.ts",
     "styles.tsx",
+    "style.ts",
     "types.ts",
     "types.tsx",
   ];
