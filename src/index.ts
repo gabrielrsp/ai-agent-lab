@@ -22,7 +22,7 @@ async function main() {
 
   const code = fs.readFileSync(filePath, "utf-8");
 
-  const review = await reviewReactComponent(code);
+  const review = await reviewReactComponent(code, resolvedPath);
 
   console.log(JSON.stringify(review, null, 2));
 }

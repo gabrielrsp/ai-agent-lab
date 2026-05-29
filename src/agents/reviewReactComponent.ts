@@ -2,11 +2,16 @@ import { generateText, Output } from "ai";
 
 import { openrouter } from "../providers/openRouter";
 import { reviewSchema } from "../schemas/reviewSchema";
-import { checkTypes } from "../tools/checkTypes";
-import { checkAccessibility } from "../tools/checkAccessibility";
+import { checkTypes } from "../tools/analysisTools/checkTypes";
+import { readRelatedFiles } from "../tools/contextTools/readRelatedFiles";
+import { checkAccessibility } from "../tools/analysisTools/checkAccessibility";
 import { ToolResult } from "../types/ToolResult";
 
-export async function reviewReactComponent(code: string) {
+
+export async function reviewReactComponent(code: string, filePath: string) {
+ 
+  const relatedFiles = readRelatedFiles(filePath)
+ 
   const toolResults: ToolResult[] = [
     {
       toolName: "checkTypes",
@@ -16,6 +21,7 @@ export async function reviewReactComponent(code: string) {
       toolName: "checkAccessibility",
       result: checkAccessibility(code),
     },
+
   ];
 
   const result = await generateText({
@@ -40,6 +46,11 @@ Responda de forma objetiva e técnica.
 Tool Results:
 
 ${JSON.stringify(toolResults, null, 2)}
+
+Related Files:
+
+${JSON.stringify(relatedFiles, null, 2)}
+
 
 Analyze this React component:
 
