@@ -20,11 +20,11 @@ async function main() {
     process.exit(1);
   }
 
-  const code = fs.readFileSync(filePath, "utf-8");
+  const code = fs.readFileSync(resolvedPath, "utf-8");
 
   const review = await reviewReactComponent(code, resolvedPath);
 
-  console.log(JSON.stringify(review, null, 2));
+  console.log("Review", review);
 }
 
 

@@ -1,11 +1,9 @@
-import { generateText, Output } from "ai";
+import { generateText, stepCountIs } from "ai";
 
 import { openrouter } from "../providers/openRouter";
-import { reviewSchema } from "../schemas/reviewSchema";
-import { checkTypes } from "../tools/analysisTools/checkTypes";
-import { checkAccessibility } from "../tools/analysisTools/checkAccessibility";
-import { ToolResult } from "../types/ToolResult";
 import { buildContext } from "../context/buildContext";
+import { checkTypesAgentTool } from "../tools/analysisTools/checkTypesAgentTool";
+import { checkAccessibilityAgentTool } from "../tools/analysisTools/checkAccessibilityAgentTool";
 
 
 export async function reviewReactComponent(code: string, filePath: string) {
@@ -14,53 +12,59 @@ export async function reviewReactComponent(code: string, filePath: string) {
     filePath,
     code
   );
-  const toolResults: ToolResult[] = [
-    {
-      toolName: "checkTypes",
-      result: checkTypes(code),
-    },
-    {
-      toolName: "checkAccessibility",
-      result: checkAccessibility(code),
-    },
 
-  ];
 
   const result = await generateText({
     model: openrouter("google/gemini-2.5-flash"),
 
-    output: Output.object({
-      schema: reviewSchema,
-    }),
+    tools: {
+      checkTypes: checkTypesAgentTool,
+      checkAccessibility: checkAccessibilityAgentTool,
+    },
+
+    toolChoice: "auto",
+
+    stopWhen: stepCountIs(5),
+
 
     system: `
-Você é um Staff Frontend Engineer especialista em:
-- React
-- TypeScript
-- Accessibility
-- Testing
-- Design Systems
+      Você é um Staff Frontend Engineer especialista em:
+      - React
+      - TypeScript
+      - Accessibility
+      - Testing
+      - Design Systems
 
-Responda de forma objetiva e técnica.
-`,
+      Responda de forma objetiva e técnica.
+      `,
 
-    prompt: `
-Tool Results:
-
-${JSON.stringify(toolResults, null, 2)}
-
-Context:
-
-${JSON.stringify(context, null, 2)}
-
-
-Analyze this React component:
-
-\`\`\`tsx
-${code}
-\`\`\`
-`,
+      prompt: `
+      You are reviewing a React component.
+      
+      First, use the available tools to check:
+      - TypeScript typing
+      - Accessibility
+      
+      After receiving the tool results, write the final review.
+      
+      Use the exact component code below as input for the tools.
+      
+      Context:
+      
+      ${JSON.stringify(context, null, 2)}
+      
+      Component code:
+      
+      \`\`\`tsx
+      ${code}
+      \`\`\`
+      `,
   });
 
-  return result.output;
+  console.log(
+    JSON.stringify(result.steps, null, 2)
+  );
+  console.log(result.text);
+
+  return result.text;
 }

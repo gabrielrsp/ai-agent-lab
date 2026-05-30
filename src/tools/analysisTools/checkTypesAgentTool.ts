@@ -1,18 +1,15 @@
-import { ToolDefinition } from "./toolDefinitions";
+import { tool } from "ai";
+import { z } from "zod";
 
-export const checkTypes: ToolDefinition<
-  string,
-  {
-    hasTypes: boolean;
-    message: string;
-  }
-> = {
-  name: "checkTypes",
-
+export const checkTypesAgentTool = tool({
   description:
     "Analyze React code and detect TypeScript typing.",
 
-  execute(code) {
+  inputSchema: z.object({
+    code: z.string(),
+  }),
+
+  execute: async ({ code }) => {
     const hasTypes =
       code.includes("interface ") ||
       code.includes("type ");
@@ -24,4 +21,4 @@ export const checkTypes: ToolDefinition<
         : "No explicit typing detected.",
     };
   },
-};
+});
