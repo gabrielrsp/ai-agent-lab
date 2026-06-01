@@ -2,8 +2,7 @@ import "dotenv/config";
 
 import fs from "node:fs";
 import path from "node:path";
-import { accessibilityReviewer } from "./agents/accessibilityReviewer";
-import { typescriptReviewer } from "./agents/typescriptReviewer";
+import { reviewOrchestrator } from "./agents/reviewOrchestrator";
 import { buildContext } from "./context/buildContext";
 
 async function main() {
@@ -35,25 +34,9 @@ async function main() {
     code
   );
 
-  const tsReview =
-    await typescriptReviewer(context);
+  const review = await reviewOrchestrator(context);
 
-  const a11yReview =
-    await accessibilityReviewer(context);
-
-  console.log(
-    "****** TYPESCRIPT REVIEW ******"
-  );
-  console.log(
-    JSON.stringify(tsReview, null, 2)
-  );
-
-  console.log(
-    "****** ACCESSIBILITY REVIEW ******"
-  );
-  console.log(
-    JSON.stringify(a11yReview, null, 2)
-  );
+  console.log(JSON.stringify(review, null, 2));
 }
 
 main().catch((error) => {
