@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { CodeContextFile } from "../../types/CodeContext";
 
 const SUPPORTED_EXTENSIONS = [".ts", ".tsx"];
 
@@ -30,28 +31,29 @@ function resolveImportPath(baseFilePath: string, importPath: string) {
   return null;
 }
 
-export function resolveImports(filePath: string, code: string) {
+export function resolveImports(
+  filePath: string,
+  code: string
+): CodeContextFile[] {
   const importRegex = /import\s+[^'"]+['"]([^'"]+)['"]/g;
 
   const imports = Array.from(code.matchAll(importRegex)).map(
     (match) => match[1]
   );
 
-  const resolvedFiles = imports
-    .map((importPath) => {
-      const resolvedPath = resolveImportPath(filePath, importPath);
+  return imports.reduce<CodeContextFile[]>((acc, importPath) => {
+    const resolvedPath = resolveImportPath(filePath, importPath);
 
-      if (!resolvedPath) {
-        return null;
-      }
+    if (!resolvedPath) {
+      return acc;
+    }
 
-      return {
-        importPath,
-        resolvedPath,
-        content: fs.readFileSync(resolvedPath, "utf-8"),
-      };
-    })
-    .filter(Boolean);
+    acc.push({
+      importPath,
+      resolvedPath,
+      content: fs.readFileSync(resolvedPath, "utf-8"),
+    });
 
-  return resolvedFiles;
+    return acc;
+  }, []);
 }

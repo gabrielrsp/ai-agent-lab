@@ -1,9 +1,9 @@
-import { generateText, stepCountIs } from "ai";
-
+import { generateText, Output, stepCountIs } from "ai";
 import { openrouter } from "../providers/openRouter";
 import { buildContext } from "../context/buildContext";
 import { checkTypesAgentTool } from "../tools/analysisTools/checkTypesAgentTool";
 import { checkAccessibilityAgentTool } from "../tools/analysisTools/checkAccessibilityAgentTool";
+import { reviewSchema } from "../schemas/reviewSchema";
 
 
 export async function reviewReactComponent(code: string, filePath: string) {
@@ -16,6 +16,11 @@ export async function reviewReactComponent(code: string, filePath: string) {
 
   const result = await generateText({
     model: openrouter("google/gemini-2.5-flash"),
+
+
+    output: Output.object({
+      schema: reviewSchema,
+    }),
 
     tools: {
       checkTypes: checkTypesAgentTool,
@@ -45,9 +50,9 @@ export async function reviewReactComponent(code: string, filePath: string) {
       - TypeScript typing
       - Accessibility
       
-      After receiving the tool results, write the final review.
+      After receiving the tool results, write the final structured review.
       
-      Use the exact component code below as input for the tools.
+      Include in toolInsights the main findings derived from the tool calls.
       
       Context:
       
@@ -61,10 +66,6 @@ export async function reviewReactComponent(code: string, filePath: string) {
       `,
   });
 
-  console.log(
-    JSON.stringify(result.steps, null, 2)
-  );
-  console.log(result.text);
 
-  return result.text;
+  return result.output;
 }

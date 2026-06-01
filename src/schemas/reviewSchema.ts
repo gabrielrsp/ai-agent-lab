@@ -5,10 +5,11 @@ export const reviewSchema = z.object({
   issues: z.array(z.string()),
   risks: z.array(z.string()),
   suggestions: z.array(z.string()),
-  toolResults: z.array(
+  toolInsights: z.array(
     z.object({
       toolName: z.string(),
-      result: z.string(),
+      finding: z.string(),
+      severity: z.enum(["low", "medium", "high"]),
     })
   ),
 });
