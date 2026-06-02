@@ -41,6 +41,7 @@ export async function typescriptReviewer(context: CodeContext): Promise<ReviewRe
       Do not suggest changes that would reduce component flexibility.
 
       For Design System components, prefer reusable and extensible typing patterns.
+      For reusable component APIs, ReactNode is preferred for children unless there is a strong reason to restrict it.
       `,
 
           prompt: `

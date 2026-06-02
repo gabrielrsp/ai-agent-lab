@@ -3,10 +3,14 @@ import { ReviewResult } from "../types/ReviewResult";
 
 import { typescriptReviewer } from "./typescriptReviewer";
 import { accessibilityReviewer } from "./accessibilityReviewer";
+import { finalReviewAgent } from "./finalReviewAgent";
 
 export interface ReviewOrchestratorResult {
-  typescript: ReviewResult;
-  accessibility: ReviewResult;
+  specialists: {
+    typescript: ReviewResult;
+    accessibility: ReviewResult;
+  };
+  final: Awaited<ReturnType<typeof finalReviewAgent>>;
 }
 
 export async function reviewOrchestrator(
@@ -15,8 +19,16 @@ export async function reviewOrchestrator(
   const typescript = await typescriptReviewer(context);
   const accessibility = await accessibilityReviewer(context);
 
-  return {
+  const final = await finalReviewAgent({
     typescript,
     accessibility,
+  });
+
+  return {
+    specialists: {
+      typescript,
+      accessibility,
+    },
+    final,
   };
 }
