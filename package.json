@@ -7,7 +7,10 @@
     "dev": "tsx src/index.ts",
     "review": "tsx src/index.ts",  
     "tool:playground": "tsx src/playground/toolCalling.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+     "git:diff": "tsx src/playground/gitDiff.ts",
+     "git:review": "tsx src/playground/gitDiffReview.ts",
+     "git:context": "tsx src/playground/gitDiffContext.ts"
   },
   "keywords": [],
   "author": "",
