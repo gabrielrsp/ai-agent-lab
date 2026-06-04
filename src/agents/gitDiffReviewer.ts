@@ -36,6 +36,9 @@ export async function gitDiffReviewer(
 
         Only provide suggestions that are directly supported by the diff or the provided code context.
 
+        Only report issues introduced or directly affected by the diff.
+        Do not mention pre-existing issues in issues unless the diff makes them worse.
+        If you notice pre-existing problems, mention them only as low-priority suggestions.
         Do not suggest new tools, libraries or architectural changes unless they are clearly justified by the changes being reviewed.
         `,
 
