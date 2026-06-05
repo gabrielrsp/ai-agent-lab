@@ -3,13 +3,28 @@ import path from "node:path";
 
 export function readRelatedFiles(filePath: string) {
   const directory = path.dirname(filePath);
+  const directoryFiles = fs.readdirSync(directory);
 
-  const candidates = [
+  const testFiles = directoryFiles.filter(
+    (file) =>
+      file.endsWith(".test.ts") ||
+      file.endsWith(".test.tsx") ||
+      file.endsWith(".spec.ts") ||
+      file.endsWith(".spec.tsx")
+  );
+
+  const staticCandidates = [
     "styles.ts",
     "styles.tsx",
     "style.ts",
+    "style.tsx",
     "types.ts",
     "types.tsx",
+  ];
+  
+  const candidates = [
+    ...staticCandidates,
+    ...testFiles,
   ];
 
   const files: { fileName: string; content: string }[] = [];
