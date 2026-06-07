@@ -6,6 +6,10 @@ import { reviewOrchestrator } from "./agents/reviewOrchestrator";
 import { testGenerationAgent } from "./agents/testGenerationAgent";
 import { buildContext } from "./context/buildContext";
 import { writeGeneratedTestFile } from "./tools/fileTools/writeGeneratedTestFile";
+import { detectTestFramework } from "./tools/contextTools/detectTestFramework";
+import { buildTestCommand } from "./tools/testTools/buildTestCommand";
+import { runTests } from "./tools/testTools/runTests";
+import { repairTestAgent } from "./agents/repairTestAgent";
 
 async function main() {
   const filePath = process.argv[2];
@@ -40,8 +44,7 @@ async function main() {
   //console.log(JSON.stringify(review, null, 2));
 
 
-  const testGeneration =
-  await testGenerationAgent(context);
+  const testGeneration = await testGenerationAgent(context);
 
   console.log("****** TEST GENERATION ******");
   console.log(testGeneration.testCode);
@@ -54,8 +57,47 @@ async function main() {
     testCode: testGeneration.testCode,
   });
   
-  console.log("Generated test file:");
-  console.log(writtenFile.filePath);
+
+  const testFramework =
+  detectTestFramework(resolvedPath);
+
+  const testCommand =
+  buildTestCommand({
+    testRunner:
+      testFramework.testRunner,
+    testFilePath:
+      writtenFile.filePath,
+  });
+
+  const testResult =
+  runTests({
+    command:
+      testCommand.command,
+    cwd:
+      "/Users/gabriel/projetos/dws-blog",
+  });
+
+
+  console.log(
+    JSON.stringify(testResult, null, 2)
+  );
+
+
+
+  if (!testResult.success) {
+    const repaired =
+      await repairTestAgent({
+        context,
+        testCode: testGeneration.testCode,
+        testOutput: testResult.output,
+      });
+  
+    writeGeneratedTestFile({
+      sourceFilePath: resolvedPath,
+      testCode: repaired.testCode,
+    });
+  }
+  
 
 }
 
@@ -67,3 +109,4 @@ main().catch((error) => {
 
   process.exit(1);
 });
+

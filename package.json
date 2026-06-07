@@ -11,7 +11,8 @@
      "git:diff": "tsx src/playground/gitDiff.ts",
      "git:review": "tsx src/playground/gitDiffReview.ts",
      "git:context": "tsx src/playground/gitDiffContext.ts",
-     "test:run": "tsx src/playground/runTests.ts"
+     "test:run": "tsx src/playground/runTests.ts",
+     "test:command": "tsx src/playground/buildTestCommand.ts"
   },
   "keywords": [],
   "author": "",

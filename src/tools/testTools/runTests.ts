@@ -27,10 +27,13 @@ export interface RunTestsInput {
   } catch (error: any) {
     return {
       success: false,
-      output:
-        error?.stdout?.toString() ??
-        error?.message ??
-        "Unknown error",
+      output: [
+        error?.stdout?.toString(),
+        error?.stderr?.toString(),
+        error?.message,
+      ]
+        .filter(Boolean)
+        .join("\n"),
     };
   }
 }
