@@ -10,7 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
      "git:diff": "tsx src/playground/gitDiff.ts",
      "git:review": "tsx src/playground/gitDiffReview.ts",
-     "git:context": "tsx src/playground/gitDiffContext.ts"
+     "git:context": "tsx src/playground/gitDiffContext.ts",
+     "test:run": "tsx src/playground/runTests.ts"
   },
   "keywords": [],
   "author": "",
