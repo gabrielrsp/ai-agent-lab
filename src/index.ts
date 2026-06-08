@@ -51,11 +51,13 @@ async function main() {
   console.log("ASSUMPTIONS:", testGeneration.assumptions);
   console.log("WARNINGS:", testGeneration.warnings);
 
+  
 
-  const writtenFile = writeGeneratedTestFile({
+  let writtenFile = writeGeneratedTestFile({
     sourceFilePath: resolvedPath,
     testCode: testGeneration.testCode,
   });
+  
   
 
   const testFramework =
@@ -69,7 +71,7 @@ async function main() {
       writtenFile.filePath,
   });
 
-  const testResult =
+  let currentResult =
   runTests({
     command:
       testCommand.command,
@@ -79,43 +81,79 @@ async function main() {
 
 
   console.log(
-    JSON.stringify(testResult, null, 2)
+    JSON.stringify(currentResult, null, 2)
   );
 
 
+  let currentTestCode =
+  testGeneration.testCode;
 
-  if (!testResult.success) {
-    console.log("****** REPAIRING TEST ******");
+  let attempts = 0;
+  const maxAttempts = 3;
+
+  while (
+    !currentResult.success &&
+    attempts < maxAttempts
+  ) {
+    attempts++;
   
-    const repaired = await repairTestAgent({
-      context,
-      testCode: testGeneration.testCode,
-      testOutput: testResult.output,
-    });
+    console.log(
+      `****** REPAIR ATTEMPT ${attempts} ******`
+    );
   
-    const repairedFile = writeGeneratedTestFile({
-      sourceFilePath: resolvedPath,
-      testCode: repaired.testCode,
-    });
+    const repaired =
+      await repairTestAgent({
+        context,
+        testCode: currentTestCode,
+        testOutput:
+          currentResult.output,
+      });
   
-    console.log("****** REPAIRED TEST ******");
-    console.log(repaired.testCode);
-    console.log("ASSUMPTIONS:", repaired.assumptions);
-    console.log("WARNINGS:", repaired.warnings);
+    currentTestCode =
+      repaired.testCode;
   
-    const repairedCommand = buildTestCommand({
-      testRunner: testFramework.testRunner,
-      testFilePath: repairedFile.filePath,
-    });
+    writtenFile =
+      writeGeneratedTestFile({
+        sourceFilePath:
+          resolvedPath,
+        testCode:
+          currentTestCode,
+      });
   
-    const repairedResult = runTests({
-      command: repairedCommand.command,
-      cwd: "/Users/gabriel/projetos/dws-blog",
-    });
+    const command =
+      buildTestCommand({
+        testRunner:
+          testFramework.testRunner,
+        testFilePath:
+          writtenFile.filePath,
+      });
   
-    console.log("****** REPAIRED TEST RESULT ******");
-    console.log(JSON.stringify(repairedResult, null, 2));
+    currentResult =
+      runTests({
+        command:
+          command.command,
+        cwd:
+          "/Users/gabriel/projetos/dws-blog",
+      });
+  
+    console.log(
+      JSON.stringify(
+        currentResult,
+        null,
+        2
+      )
+    );
   }
+
+  console.log(
+    "FINAL RESULT"
+  );
+  
+  console.log({
+    success:
+      currentResult.success,
+    attempts,
+  });
   
 
 }

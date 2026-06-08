@@ -87,7 +87,24 @@ export async function testGenerationAgent(
         - Do not use toHaveAttribute for props like variant, size, color or visual-only props.
         - If a visual prop does not produce an accessible behavior or public DOM attribute, do not generate a test for it.
         - Return only valid test code.
-    `,
+
+        If an existing test file is present, prefer extending it conservatively instead of creating a much broader test suite.
+
+        Do not generate complex interaction tests involving multiple async state updates unless the existing test file already covers a similar pattern.
+
+        - Do not generate dispatch assertion tests unless an existing test file already contains a similar dispatch assertion pattern.
+        - Avoid generating tests that combine multiple interactions and dispatch assertions unless the component API and DOM behavior are explicit in the context.
+
+        For components with async data fetching, prioritize:
+        - loading state
+        - successful render after fetch
+        - error state if clearly supported
+       - For simple text assertions like headings or labels, prefer getByText/findByText unless the accessible role is essential to the behavior being tested.
+    
+      Generate at most 5 high-value tests.
+      Prefer behavior/output assertions over style assertions.
+      Do not test visual selected state unless it changes accessible state.
+       `,
 
 
     prompt: `
