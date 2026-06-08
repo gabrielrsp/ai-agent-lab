@@ -85,17 +85,36 @@ async function main() {
 
 
   if (!testResult.success) {
-    const repaired =
-      await repairTestAgent({
-        context,
-        testCode: testGeneration.testCode,
-        testOutput: testResult.output,
-      });
+    console.log("****** REPAIRING TEST ******");
   
-    writeGeneratedTestFile({
+    const repaired = await repairTestAgent({
+      context,
+      testCode: testGeneration.testCode,
+      testOutput: testResult.output,
+    });
+  
+    const repairedFile = writeGeneratedTestFile({
       sourceFilePath: resolvedPath,
       testCode: repaired.testCode,
     });
+  
+    console.log("****** REPAIRED TEST ******");
+    console.log(repaired.testCode);
+    console.log("ASSUMPTIONS:", repaired.assumptions);
+    console.log("WARNINGS:", repaired.warnings);
+  
+    const repairedCommand = buildTestCommand({
+      testRunner: testFramework.testRunner,
+      testFilePath: repairedFile.filePath,
+    });
+  
+    const repairedResult = runTests({
+      command: repairedCommand.command,
+      cwd: "/Users/gabriel/projetos/dws-blog",
+    });
+  
+    console.log("****** REPAIRED TEST RESULT ******");
+    console.log(JSON.stringify(repairedResult, null, 2));
   }
   
 
