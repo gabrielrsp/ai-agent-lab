@@ -12,7 +12,9 @@
      "git:review": "tsx src/playground/gitDiffReview.ts",
      "git:context": "tsx src/playground/gitDiffContext.ts",
      "test:run": "tsx src/playground/runTests.ts",
-     "test:command": "tsx src/playground/buildTestCommand.ts"
+     "test:command": "tsx src/playground/buildTestCommand.ts",
+     "router": "tsx src/playground/router.ts",
+     "engineering:router": "tsx src/playground/engineeringRouter.ts"
   },
   "keywords": [],
   "author": "",
