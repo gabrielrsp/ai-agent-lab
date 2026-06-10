@@ -2,6 +2,7 @@ import { routerAgent } from "../agents/routerAgent";
 import { testGenerationAgent } from "../agents/testGenerationAgent";
 import { CodeContext } from "../types/CodeContext";
 import { generateTestsWorkflow } from "./generateTestsWorkflow";
+import { reviewWorkflow } from "./reviewWorkflow";
 
 type EngineeringRouterInput = {
   task: string;
@@ -37,13 +38,25 @@ export async function engineeringRouter({
       };
     }
 
-    case "review":
+    case "review": {
+      if (!context) {
+        return {
+          workflow: "review",
+          route,
+          success: false,
+          error: "CodeContext is required to review code.",
+        };
+      }
+    
+      const result = await reviewWorkflow(context);
+    
       return {
         workflow: "review",
         route,
-        success: false,
-        error: "Review workflow is not connected yet.",
+        success: true,
+        result,
       };
+    }
 
     case "git_diff_review":
       return {

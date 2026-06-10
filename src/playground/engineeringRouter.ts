@@ -8,7 +8,7 @@ import { engineeringRouter } from "../workflows/engineeringRouter";
 
 async function main() {
   const filePath = path.resolve(
-    "/Users/gabriel/projetos/dws-blog/src/components/Button/index.tsx"
+    "/Users/gabriel/projetos/dws-blog/src/components/Sidebar/index.tsx"
   );
 
   const code = fs.readFileSync(filePath, "utf-8");
@@ -16,7 +16,7 @@ async function main() {
   const context = buildContext(filePath, code);
 
   const result = await engineeringRouter({
-    task: "generate RTL tests for this component",
+    task: "review this component",
     context,
   });
 
